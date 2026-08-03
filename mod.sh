@@ -41,6 +41,6 @@ mv ./fmk/new-firmware.bin $FIRMWARE_OUT
 
 #firmware_patch_img
 
-firmware_crc 540 1 1024 3735040 # checksum of image without bootloader and header, written to bootloader
+firmware_crc 540 1 1024 3669504 # checksum of the first 3,669,504 bytes of the image without bootloader and header, written to bootloader
 firmware_crc 544 1 512  512     # checksum of bootloader only, written to bootloader
 firmware_crc 104 0 0    3736064 # checksum of image with bootloader and header, written to header
