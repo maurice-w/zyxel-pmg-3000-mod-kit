@@ -1,83 +1,16 @@
 ```
- _   _               _       ____  ____    ___   _   _ 
-| | | |  __ _   ___ | | __  / ___||  _ \  / _ \ | \ | |
-| |_| | / _` | / __|| |/ / | |  _ | |_) || | | ||  \| |
-|  _  || (_| || (__ |   <  | |_| ||  __/ | |_| || |\  |
-|_| |_| \__,_| \___||_|\_\  \____||_|     \___/ |_| \_|
-```
+$ podman pull kali-rolling
+$ podman run --tty --interactive kali-rolling
 
-# Zyxel PMG3000-d20b firmware mod kit
+# apt update
+# apt install -y bc binwalk bsdextrautils firmware-mod-kit python2 wget xxd zip
+# ln -s /usr/bin/python2 /usr/bin/python
 
-> [!IMPORTANT] 
-> See https://hack-gpon.org/ont-zyxel-pmg3000-d20b/ before use this mod kit.
+# git clone https://github.com/maurice-w/zyxel-pmg-3000-mod-kit
+# cd zyxel-pmg-3000-mod-kit
 
-## Prerequisites
-- Linux os
-- firmware-mod-kit built. Use https://github.com/st-ty1/Arch-Linux_firmware-mod-kit on a modern distro
-- an mtd dump of the rootfs to be modded
-
-## Usage
-- Edit build.sh, changing the settings at the top
-- Run build.sh as root
-- The script will tell you where the new mtd is
-
-## Flashing
-
-> [!IMPORTANT] 
-> See https://hack-gpon.org/ont-zyxel-pmg3000-d20b/ for up-to-date command.
-
-Note: all commands start from the twmanu shell
-- Transfer the new mtd on the stick via tftp
-```
-linuxshell
-tftp -gr mtd2.mod.bin TFTP_SERVER_IP
-```
-- Flash it on the standby partition. 
-You can use `system` and then `show actimage` to get the current active image. Check `/proc/mtd` for the right mtds. Usually:
-- if the currect active image is A the mtd in use is mtd2
-- If the current active image is B the mtd in use is mtd3
-```
-linuxshell
-mtd -e /dev/mtd2 write /tmp/mtd2.mod.bin /dev/mtd2
-```
-- Switch to the new image
-```
-system
-set actimage a
-```
-- Reboot the ONT
-```
-system
-reboot
-```
-
-## Other tibits
-
-> [!IMPORTANT] 
-> See https://hack-gpon.org/ont-zyxel-pmg3000-d20b/ for up-to-date command.
-
-## Change PLOAM
-Use the web UI
-## Change ONT S/N
-```
-manufactory
-set sn ALCLf0f0f0f0
-exit
-hal
-set sn ALCLf0f0f0f0
-```
-## Change ONT equipment ID
-Note: model number must be 20 chars total (or less?)
-
-```
-manufactory
-set equipment id __________G-010G-R__
-exit
-omci
-equipment id __________G-010G-R__
-```
-## Change hardware version
-```
-manufactory
-set hardware version 3FE49165BFAA01
+# wget "https://gist.github.com/maurice-w/faeb60bf8201ce70391873bcb9059bc2/raw/1c6e70a86c231cc7b951e84690de3c1e5c436623/Zyxel_PMG3000-D20B_V1.00(ABVJ.0)b3v_2021-05-08.zip"
+# wget "https://gist.github.com/maurice-w/faeb60bf8201ce70391873bcb9059bc2/raw/1c6e70a86c231cc7b951e84690de3c1e5c436623/Zyxel_PMG3000-D20B_V1.00(ABVJ.1)b1i_2026-02-06.zip"
+# unzip Zyxel*
+# ./mod.sh V1.00\(ABVJ.1\)b1i_2026-02-06.upf V1.00\(ABVJ.0\)b3v_2021-05-08.upf
 ```
