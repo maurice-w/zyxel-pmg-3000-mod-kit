@@ -17,16 +17,6 @@ function byte_hex2bin {
     fi
 }
 
-function firmware_patch_img {
-    # convert squashfs filesystem creation date to binary and write to bootloader
-    stime=`binwalk $FIRMWARE_OUT | grep 0x140200 | grep -oP "created\: ([0-9\-\: ]+)" | sed -e "s/created: //g"`
-    itime=`date --date="${stime}" +"%s"`
-    itime=$(($itime + 7202))
-    htime=`echo "obase=16; ${itime}" | bc`
-    htime=$(byte_hex2bin $htime 1)
-    echo -e "${htime}" | dd of=$FIRMWARE_OUT bs=1 seek=520 count=4 conv=notrunc
-}
-
 function firmware_crc {
     dd if=/dev/zero of=$FIRMWARE_OUT bs=1 seek=$1 count=4 conv=notrunc
     crc=`$CRC32 $FIRMWARE_OUT $3 $4 | tail -n 1 | awk '{print $2}' | sed "s/0x//1"`
@@ -35,11 +25,12 @@ function firmware_crc {
 }
 
 $FMK_EXTRACT $FIRMWARE_IN
-cp ./fmk/rootfs/usr/sbin/dropbear ./fmk/rootfs/usr/local/bin/
+cp -a ./fmk/rootfs/usr/sbin/dropbear ./fmk/rootfs/usr/local/bin/
+# copy /etc/dropbear directory from firmware image with ssh first
+# cp -a ./fmk/rootfs/etc/dropbear ./
+cp -a ./dropbear ./fmk/rootfs/etc/
 $FMK_BUILD
 mv ./fmk/new-firmware.bin $FIRMWARE_OUT
-
-#firmware_patch_img
 
 firmware_crc 540 1 1024 3669504 # checksum of the first 3,669,504 bytes of the image without bootloader and header, written to bootloader
 firmware_crc 544 1 512  512     # checksum of bootloader only, written to bootloader
