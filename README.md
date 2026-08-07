@@ -3,7 +3,7 @@ $ podman pull kali-rolling
 $ podman run --tty --interactive kali-rolling
 
 # apt update
-# apt install -y bc binwalk bsdextrautils firmware-mod-kit python2 wget xxd zip
+# apt install -y bsdextrautils firmware-mod-kit python2 unzip wget xxd
 # ln -s /usr/bin/python2 /usr/bin/python
 
 # git clone https://github.com/maurice-w/zyxel-pmg-3000-mod-kit
