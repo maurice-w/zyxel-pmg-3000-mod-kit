@@ -4,7 +4,7 @@
 FIRMWARE_IN=$1
 # FIRMWARE_SSH_IN needs to be a an older firmware with SSH
 FIRMWARE_SSH_IN=$2
-FIRMWARE_OUT="./firmware_with_ssh.upf"
+FIRMWARE_OUT="firmware_with_ssh.upf"
 FMK_DIR="/opt/firmware-mod-kit/trunk"
 FMK_EXTRACT="${FMK_DIR}/extract-firmware.sh"
 FMK_BUILD="${FMK_DIR}/build-firmware.sh"
@@ -26,15 +26,18 @@ function firmware_crc {
     echo -e "${crc}" | dd of=$FIRMWARE_OUT bs=1 seek=$1 count=4 conv=notrunc
 }
 
+rm -r fmk
+rm -r dropbear
+
 $FMK_EXTRACT $FIRMWARE_SSH_IN
-cp -a ./fmk/rootfs/etc/dropbear ./
-rm -r ./fmk
+cp -a fmk/rootfs/etc/dropbear ./
+rm -r fmk
 
 $FMK_EXTRACT $FIRMWARE_IN
-cp -a ./fmk/rootfs/usr/sbin/dropbear ./fmk/rootfs/usr/local/bin/
-cp -a ./dropbear ./fmk/rootfs/etc/
+cp -a fmk/rootfs/usr/sbin/dropbear fmk/rootfs/usr/local/bin/
+cp -a dropbear fmk/rootfs/etc/
 $FMK_BUILD
-mv ./fmk/new-firmware.bin $FIRMWARE_OUT
+mv fmk/new-firmware.bin $FIRMWARE_OUT
 
 firmware_crc 540 1 1024 3669504 # checksum of the first 3,669,504 bytes of the image without bootloader and header, written to bootloader
 firmware_crc 544 1 512  512     # checksum of bootloader only, written to bootloader
