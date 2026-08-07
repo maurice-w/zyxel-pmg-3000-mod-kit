@@ -2,8 +2,6 @@
 
 # FIRMWARE_IN needs to be a .upf file (with header), not a raw mtd2 / mtd3 image
 FIRMWARE_IN=$1
-# FIRMWARE_SSH_IN needs to be a an older firmware with SSH
-FIRMWARE_SSH_IN=$2
 FIRMWARE_OUT="firmware_with_ssh.upf"
 FMK_DIR="/opt/firmware-mod-kit/trunk"
 FMK_EXTRACT="${FMK_DIR}/extract-firmware.sh"
@@ -27,15 +25,11 @@ function firmware_crc {
 }
 
 rm -r fmk
-rm -r dropbear
-
-$FMK_EXTRACT $FIRMWARE_SSH_IN
-cp -a fmk/rootfs/etc/dropbear ./
-rm -r fmk
-
 $FMK_EXTRACT $FIRMWARE_IN
 cp -a fmk/rootfs/usr/sbin/dropbear fmk/rootfs/usr/local/bin/
-cp -a dropbear fmk/rootfs/etc/
+mkdir fmk/rootfs/etc/dropbear
+dropbearkey -t rsa -f fmk/rootfs/etc/dropbear/dropbear_rsa_host_key
+rm fmk/rootfs/etc/dropbear/dropbear_rsa_host_key.pub
 $FMK_BUILD
 mv fmk/new-firmware.bin $FIRMWARE_OUT
 
